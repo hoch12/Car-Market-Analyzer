@@ -5,8 +5,9 @@ Car Market Analyzer is a machine learning-powered desktop application that estim
 ## 📌 Features
 - **Real-Time Price Estimation**: Predict current market value based on brand, year, mileage, fuel type, and transmission.
 - **Future Value Projection**: Visualizes the estimated depreciation curve for years 2026-2030.
-- **Data-Driven**: Trained on a dataset of over 2,000 real car listings scraped from Czech market portals.
-- **User-Friendly GUI**: Simple, clean interface with English localization.
+- **Data-Driven**: Trained on a dataset of over **2,200 validated listings** from Czech market portals.
+- **Robust Validation**: Automatically checks if the selected car configuration (e.g., Brand + Fuel) actually exists in reality to prevent invalid predictions.
+- **User-Friendly GUI**: Simple, clean interface fully localized in **Czech**.
 
 ---
 

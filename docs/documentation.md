@@ -55,7 +55,9 @@ We evaluated the following repositories for potential reuse:
 2.  **`library-inventory-manager`**: A Flask-based web app with SQL database. **Result**: Not used (Project is a local desktop app with different architecture).
 3.  **`P2P-team-project`**: Written in C#/.NET. **Result**: Not used (Incompatible technology stack).
 
----
+### D. Localization & Validation
+-   **Czech Localization**: The entire application (GUI, internal logic, and configuration) is localized to Czech to match the source data from Sauto.cz.
+-   **Robust Validation**: Inputs are validated against `model_metadata.json`, which contains a complete map of valid Brand-Fuel-Transmission combinations derived from the training data. This prevents invalid queries (e.g., "Tesla Diesel") from reaching the model.
 
 ## 4. Testing Strategy
 

@@ -45,6 +45,67 @@ class PricePredictor:
 
         self.model = joblib.load(model_path)
         self.model_columns = joblib.load(columns_path)
+        
+        # Load Metadata
+        metadata_path = os.path.join(os.path.dirname(model_path), 'model_metadata.json')
+        if os.path.exists(metadata_path):
+             import json
+             with open(metadata_path, 'r', encoding='utf-8') as f:
+                 self.metadata = json.load(f)
+        else:
+             self.metadata = None
+
+    def validate_input(self, brand, fuel, transmission):
+        """
+        Validates if the Brand + Fuel + Transmission combination exists in the training data.
+        Raises ValueError with specific message if invalid.
+        """
+        if self.metadata is None:
+            return # Skip validation if metadata missing
+            
+        if brand not in self.metadata:
+            # Try Case-Insensitive matching
+            brands_lower = {b.lower(): b for b in self.metadata.keys()}
+            if brand.lower() in brands_lower:
+                brand = brands_lower[brand.lower()] # Correct casing
+            else:
+                 raise ValueError(f"Brand '{brand}' not found in database.")
+
+        # --- TRANSLATE INPUTS (English -> Czech) ---
+        mapped_fuel = self.model_config.get('fuel_mapping', {}).get(fuel)
+        if mapped_fuel:
+             # "fuel_Benzín" -> "Benzín"
+             check_fuel = mapped_fuel.replace('fuel_', '')
+        else:
+             check_fuel = fuel # Fallback
+
+        mapped_trans = self.model_config.get('transmission_mapping', {}).get(transmission)
+        if mapped_trans:
+             # "transmission_Manuální" -> "Manuální"
+             check_trans = mapped_trans.replace('transmission_', '')
+        else:
+             check_trans = transmission # Fallback
+
+        # Check Fuel
+        valid_fuels = self.metadata[brand]['fuels']
+        # Metadata has raw specific fuels (Benzín, Nafta...), but input might be generalized?
+        
+        # We need to map GUI input to Metadata values loosely
+        fuel_match = False
+        for valid_fuel in valid_fuels:
+            # Check against translated fuel OR original fuel
+            if check_fuel.lower() in valid_fuel.lower() or valid_fuel.lower() in check_fuel.lower():
+                fuel_match = True
+                break
+        
+        if not fuel_match:
+             # Show translated label if possible for clarity
+             raise ValueError(f"'{brand}' with '{fuel}' engine not found in database.\nAvailable: {', '.join(valid_fuels)}")
+
+        # Check Transmission
+        valid_trans = self.metadata[brand]['transmissions']
+        if check_trans not in valid_trans:
+             raise ValueError(f"'{brand}' with '{transmission}' transmission not found in database.\nAvailable: {', '.join(valid_trans)}")
 
     def get_clean_brands(self):
         if self.model_columns is None:

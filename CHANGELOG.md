@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.4.0] - 2026-02-08
+### Changed
+- **Localization:**
+    - Switched entire application (GUI, Config, Model) to **Czech language** for consistency with dataset.
+    - Updated `config.json` mappings to use Czech keys (`Benzín`, `Nafta`...).
+- **Model Accuracy:**
+    - **Retrained Model:** Fixed "Identical Price" issue utilizing new data cleaning pipeline.
+    - **Brand Normalization:** Implemented advanced parsing to extract brands from URLs and normalize mixed case (e.g. "bmw" -> "BMW").
+    - **Data Recovery:** Recovered ~2000 listings that were previously discarded due to malformed titles.
+
+### Added
+- **Robust Error Handling:**
+    - Validates user input against reliable `model_metadata.json`.
+    - Displays specific error messages (e.g., "Škoda with Diesel not found") instead of crashing.
+
 ## [0.3.0] - 2026-02-08
 ### Added
 - **Localization System:**

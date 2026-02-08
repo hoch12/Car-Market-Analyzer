@@ -99,37 +99,37 @@ class CarPriceApp:
 
         # 1. Brand
         self.brand_var = tk.StringVar()
-        self.brand_cb = add_field("Car Brand:", self.brand_var, values=self.brands)
+        self.brand_cb = add_field("Značka vozidla:", self.brand_var, values=self.brands)
         if self.brands: self.brand_cb.current(0)
 
         # 2. Year
-        self.year_entry = add_field("Year of Manufacture:", None, is_entry=True)
+        self.year_entry = add_field("Rok výroby:", None, is_entry=True)
         self.year_entry.insert(0, str(datetime.datetime.now().year - 4))
 
         # 3. Mileage
-        self.mileage_entry = add_field("Mileage (km):", None, is_entry=True)
+        self.mileage_entry = add_field("Nájezd (km):", None, is_entry=True)
         self.mileage_entry.insert(0, "65000")
 
         # 4. Fuel
         self.fuel_var = tk.StringVar()
-        self.fuel_cb = add_field("Fuel Type:", self.fuel_var, values=self.fuel_types)
+        self.fuel_cb = add_field("Palivo:", self.fuel_var, values=self.fuel_types)
         if self.fuel_types: self.fuel_cb.current(0)
 
         # 5. Transmission
         self.trans_var = tk.StringVar()
-        self.trans_cb = add_field("Transmission:", self.trans_var, values=self.transmissions)
+        self.trans_cb = add_field("Převodovka:", self.trans_var, values=self.transmissions)
         if self.transmissions: self.trans_cb.current(0)
 
         # --- BUTTON ---
         btn_frame = tk.Frame(self.root, bg=bg_primary, pady=20)
         btn_frame.pack(fill=tk.X)
         
-        btn = tk.Button(btn_frame, text="CALCULATE PRICE & PREDICTION", command=self.calculate_all,
+        btn = tk.Button(btn_frame, text="SPOČÍTAT CENU A PREDIKCI", command=self.calculate_all,
                         bg=accent_color, fg=btn_fg, font=(font_family, 13, "bold"), padx=30, pady=12, relief="flat")
         btn.pack()
 
         # --- RESULT ---
-        self.result_label = tk.Label(self.root, text="Enter data and click the button",
+        self.result_label = tk.Label(self.root, text="Zadejte údaje a klikněte na tlačítko",
                                      font=(font_family, 18, "bold"), bg=bg_primary, fg=success_color)
         self.result_label.pack(pady=10)
 
@@ -143,12 +143,12 @@ class CarPriceApp:
             if current_price is None: return
 
             formatted = f"{int(current_price):,}".replace(",", " ")
-            self.result_label.config(text=f"Current Estimate: {formatted} CZK")
+            self.result_label.config(text=f"Odhad ceny: {formatted} Kč")
 
             self.plot_future_trend(current_price)
 
         except Exception as e:
-            messagebox.showerror("Critical Error", str(e))
+            messagebox.showerror("Kritická chyba", str(e))
 
     def predict_current_price(self):
         # --- VALIDATION ---
@@ -156,16 +156,16 @@ class CarPriceApp:
             year = int(self.year_entry.get())
             mileage = int(self.mileage_entry.get())
         except ValueError:
-            messagebox.showwarning("Error", "Year and mileage must be numbers!")
+            messagebox.showwarning("Chyba", "Rok a nájezd musí být čísla!")
             return None
 
         current_year = datetime.datetime.now().year
         if year < 1980 or year > current_year + 1:
-            messagebox.showwarning("Error", f"Year must be between 1980 and {current_year + 1}.")
+            messagebox.showwarning("Chyba", f"Rok musí být mezi 1980 a {current_year + 1}.")
             return None
 
         if mileage < 0 or mileage > 2000000:
-            messagebox.showwarning("Error", "Mileage is out of realistic range.")
+            messagebox.showwarning("Chyba", "Nájezd je mimo reálný rozsah.")
             return None
 
         brand = self.brand_var.get()
@@ -173,15 +173,22 @@ class CarPriceApp:
         trans = self.trans_var.get()
 
         if not brand:
-            messagebox.showwarning("Error", "Select a brand!")
+            messagebox.showwarning("Chyba", "Vyberte značku vozidla!")
             return None
+
+        # --- VALIDATE INPUT ---
+        try:
+            self.predictor.validate_input(brand, fuel, trans)
+        except ValueError as ve:
+             messagebox.showwarning("Neplatná Konfigurace", str(ve))
+             return None
 
         # --- USE PREDICTOR ---
         try:
             price = self.predictor.predict_price(year, mileage, brand, fuel, trans)
             return price
         except Exception as e:
-            messagebox.showerror("Prediction Error", str(e))
+            messagebox.showerror("Chyba Predikce", str(e))
             return None
 
     def plot_future_trend(self, start_price):
@@ -215,8 +222,8 @@ class CarPriceApp:
         ax.tick_params(colors=text_main)
         ax.yaxis.label.set_color(text_main)
         ax.xaxis.label.set_color(text_main)
-        ax.set_title(f"Price Trend Prediction ({years[0]}-{years[-1]})", fontsize=12, color=text_main)
-        ax.set_ylabel("Price (CZK)", color=text_main)
+        ax.set_title(f"Predikce vývoje ceny ({years[0]}-{years[-1]})", fontsize=12, color=text_main)
+        ax.set_ylabel("Cena (Kč)", color=text_main)
         ax.grid(True, linestyle='--', alpha=0.3, color=text_main)
 
         # Format Y-axis to avoid scientific notation and use 'k' or 'M'

@@ -34,16 +34,16 @@
     "depreciation_rate": 0.10,
     "future_projection_years": 5,
     "fuel_mapping": {
-      "Petrol": null,
-      "Diesel": "fuel_Nafta",
-      "Electric": "fuel_Elektro",
+      "Benzín": "fuel_Benzín",
+      "Nafta": "fuel_Nafta",
+      "Elektro": "fuel_Elektro",
       "Hybrid": "fuel_Hybridní",
-      "LPG": "fuel_Other",
-      "CNG": "fuel_Other"
+      "LPG": "fuel_LPG",
+      "CNG": "fuel_CNG"
     },
     "transmission_mapping": {
-      "Manual": "transmission_Manuální",
-      "Automatic": null
+      "Manuální": "transmission_Manuální",
+      "Automatická": "transmission_Automatická"
     }
   }
 }
